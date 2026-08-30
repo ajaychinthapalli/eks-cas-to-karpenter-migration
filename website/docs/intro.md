@@ -1,19 +1,22 @@
-# eks-cas-to-karpenter-migration
+---
+id: intro
+title: Overview
+sidebar_label: Overview
+sidebar_position: 1
+slug: /
+---
 
-Cluster Autoscaler → Karpenter Migration
+# EKS Cluster Autoscaler → Karpenter Migration
 
-Documentation of the migration performed on the `achin16-workspace` EKS cluster
-(account `<AWS_ACCOUNT_ID>`, region `us-east-2`), following the 6-step process below.
-Every command here was actually run against a live cluster; outputs and
-troubleshooting notes are captured in each step's doc.
+Documentation of the migration performed on the `achin16-workspace` EKS cluster following a 6-step process.
+Every command here was actually run against a live cluster; outputs and troubleshooting notes are captured in each step's doc.
 
-## Cluster facts (as found)
+## Cluster Facts (as found)
 
 | Item | Value |
 |---|---|
 | Cluster name | `achin16-workspace` |
 | Region | `us-east-2` |
-| Account ID | `<AWS_ACCOUNT_ID>` |
 | Kubernetes version | `1.36` |
 | OIDC issuer | `oidc.eks.us-east-2.amazonaws.com/id/<OIDC_ID>` |
 | Existing compute | Self-managed ASG `achin16nodegroupstack-NodeGroup-*` (3× `t3.small`), **not** an EKS-managed nodegroup, **not** Fargate |
@@ -34,58 +37,25 @@ The diagram above illustrates four key areas:
 
 ## Steps
 
-1. [Prepare](docs/01-prepare.md)
-2. [Tag Resources](docs/02-tag-resources.md)
-3. [Create IAM Role](docs/03-create-iam-role.md)
-4. [Install Karpenter](docs/04-install-karpenter.md)
-5. [Create EC2NodeClass & NodePool](docs/05-create-nodeclass-nodepool.md)
-6. [Test & Migrate](docs/06-test-and-migrate.md)
+1. [Prepare](./prepare) — Confirm cluster access, K8s version, existing compute, and VPC layout.
+2. [Tag Resources](./tag-resources) — Tag subnets and node security group for Karpenter discovery.
+3. [Create IAM Role](./create-iam-role) — Create node and controller IAM roles.
+4. [Install Karpenter](./install-karpenter) — Install via Helm.
+5. [Create EC2NodeClass & NodePool](./create-nodeclass-nodepool) — Define what Karpenter launches.
+6. [Test & Migrate](./test-and-migrate) — Verify provisioning and complete migration.
 
-See [troubleshooting.md](docs/troubleshooting.md) for every issue actually hit
-during this migration and how it was resolved — worth reading before you repeat
-this elsewhere, since several of these are easy to hit again.
+See [Troubleshooting](./troubleshooting) for every issue actually hit during this migration.
 
-## Repo layout
-
-```
-eks-cas-to-karpenter-migration/
-├── README.md
-├── docs/
-│   ├── 01-prepare.md
-│   ├── 02-tag-resources.md
-│   ├── 03-create-iam-role.md
-│   ├── 04-install-karpenter.md
-│   ├── 05-create-nodeclass-nodepool.md
-│   ├── 06-test-and-migrate.md
-│   └── troubleshooting.md
-├── manifests/
-│   ├── ec2nodeclass.yaml
-│   ├── nodepool.yaml
-│   └── test-scaleup.yaml
-├── policies/
-│   ├── node-trust-policy.json
-│   ├── controller-trust-policy.json
-│   └── controller-permissions-policy.json
-└── scripts/
-    └── deploy.sh
-```
-
-## Final state (achieved)
+## Final State (achieved)
 
 - ✅ Karpenter `1.13.1` running, 2/2 pods healthy
 - ✅ Existing `achin16nodegroupstack` ASG kept as small system node group
 - ✅ Proven: pods scheduled on Karpenter-launched nodes, then consolidated away automatically
 - ✅ Cluster Autoscaler was never present on this cluster, so there was nothing to disable
 
-## Known limitations / follow-ups not yet done
+## Known Limitations / Follow-ups
 
-- Subnets are public — no NAT gateway/private subnets exist in this VPC. Fine for
-  a sandbox, revisit before production use.
-- Account's shared EC2 vCPU quota (`L-1216C47A`, Standard A/C/D/H/I/M/R/T/Z family)
-  is **16 vCPU**, shared with an unrelated stack (`demonodesstack`, 3× `t3.small`)
-  in the same account/region. Real workloads needing larger/multiple instances
-  may hit `VcpuLimitExceeded` — request a quota increase before relying on this
-  for anything beyond testing.
-- No SQS interruption queue configured (`settings.interruptionQueue` left empty)
-  — only matters if/when Spot capacity is added.
+- Subnets are public — no NAT gateway/private subnets exist in this VPC. Fine for a sandbox, revisit before production use.
+- Account's shared EC2 vCPU quota (`L-1216C47A`, Standard A/C/D/H/I/M/R/T/Z family) is **16 vCPU**, shared with an unrelated stack (`demonodesstack`, 3× `t3.small`) in the same account/region.
+- No SQS interruption queue configured (`settings.interruptionQueue` left empty) — only matters if/when Spot capacity is added.
 - Only on-demand capacity type configured in the NodePool; Spot not yet enabled.

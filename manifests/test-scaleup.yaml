@@ -1,0 +1,24 @@
+# Used in docs/06-test-and-migrate.md, Test 2 (forced scale-up).
+# Requests are deliberately sized so pods cannot fit on existing t3.small
+# nodes, forcing Karpenter to provision a new node.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: karpenter-test
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: karpenter-test
+  template:
+    metadata:
+      labels:
+        app: karpenter-test
+    spec:
+      containers:
+        - name: pause
+          image: public.ecr.aws/eks-distro/kubernetes/pause:3.2
+          resources:
+            requests:
+              cpu: "1800m"
+              memory: 512Mi
