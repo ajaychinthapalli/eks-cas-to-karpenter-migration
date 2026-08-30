@@ -55,3 +55,7 @@ venv/
 
 # ----- Node (if tooling is added) -----
 node_modules/
+
+# ----- Docusaurus build output -----
+website/build/
+website/.docusaurus/
