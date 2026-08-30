@@ -1,0 +1,57 @@
+# .gitignore for eks-cas-to-karpenter-migration
+
+# ----- OS / editor artefacts -----
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.code-workspace
+
+# ----- AWS / credentials -----
+.aws/
+*.pem
+*.key
+credentials
+aws-credentials
+
+# ----- Terraform (if added later) -----
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# ----- Helm / Karpenter chart cache -----
+charts/
+*.tgz
+
+# ----- kubectl context / kubeconfig -----
+kubeconfig
+kubeconfig-*
+.kube/
+
+# ----- Temporary / generated files -----
+tmp/
+*.tmp
+*.bak
+*.log
+rendered/
+output/
+
+# ----- Python (scripts) -----
+__pycache__/
+*.py[cod]
+.env
+venv/
+.venv/
+
+# ----- Node (if tooling is added) -----
+node_modules/
