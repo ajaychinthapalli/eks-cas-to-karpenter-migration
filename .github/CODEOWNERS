@@ -1,0 +1,21 @@
+# CODEOWNERS
+# Each line is a file pattern followed by one or more owners.
+# Owners are automatically requested for review when someone opens a PR
+# that modifies code matching that pattern.
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything in the repo
+*                           @ajaychinthapalli
+
+# Documentation
+docs/                       @ajaychinthapalli
+README.md                   @ajaychinthapalli
+
+# Kubernetes manifests
+manifests/                  @ajaychinthapalli
+
+# IAM policies
+policies/                   @ajaychinthapalli
+
+# Scripts
+scripts/                    @ajaychinthapalli
