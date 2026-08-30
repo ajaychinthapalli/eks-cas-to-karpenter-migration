@@ -48,7 +48,7 @@ const config = {
         docs: {
           sidebarPath: './sidebars.js',
           editUrl:
-            'https://github.com/ajaychinthapalli/eks-cas-to-karpenter-migration/tree/main/',
+            'https://github.com/ajaychinthapalli/eks-cas-to-karpenter-migration/tree/main/website/',
           routeBasePath: 'docs',
         },
         blog: false,
