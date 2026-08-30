@@ -21,6 +21,17 @@ troubleshooting notes are captured in each step's doc.
 | Node security group | `<NODE_SECURITY_GROUP_ID>` (`achin16nodegroupstack-NodeSecurityGroup-*`) |
 | Karpenter version installed | `1.13.1` (required — `1.36` needs Karpenter `>= 1.13` per [compatibility matrix](https://karpenter.sh/docs/upgrading/compatibility/)) |
 
+## Architecture Overview
+
+![Cluster Autoscaler vs Karpenter — Migration Overview, Key Components, Node Provisioning Flow, and Required AWS Tags](https://github.com/user-attachments/assets/a1b08435-7438-45cc-92f4-3f2732c2335a)
+
+The diagram above illustrates four key areas:
+
+- **Cluster Autoscaler vs Karpenter** — Cluster Autoscaler scales existing node groups via Auto Scaling Groups; Karpenter provisions right-sized EC2 instances directly based on pending pods, yielding better utilisation, faster scaling, and lower cost.
+- **Migration Overview** — Six sequential steps (Prepare → Tag Resources → Create IAM Role → Install Karpenter → Create EC2NodeClass & NodePool → Test & Migrate) leading to a final state of Karpenter Active + a small system node group + workloads on Karpenter nodes.
+- **Karpenter Key Components** — Karpenter Controller watches for unschedulable pods; `EC2NodeClass` defines infrastructure (AMI, subnets, security groups, IAM role, tags); `NodePool` defines provisioning rules (instance types, capacity type, labels/taints, limits); `NodeClaim` represents a node being launched.
+- **Karpenter Node Provisioning Flow** — Pending Pod → Karpenter Detects → Select Best Fit → Launch EC2 Instance → Register & Schedule, resulting in automated, right-sized, efficient compute.
+
 ## Steps
 
 1. [Prepare](docs/01-prepare.md)
